@@ -1,0 +1,17 @@
+ampersand para pedir el puntero de una variable:
+
+int * punteroVariable = &variable;
+
+(nótese que el tipo es 'int *', el puntero de un int )
+
+asterisco para pedir el valor a un puntero:
+
+int variable = *puneroVariable;
+
+para cambiar el valor de variable a partir de el puntero
+
+*puneroVariable = nuevoValor;
+
+
+implementar una lista enlazada en c.
+Los métodos vistos en clase más:
