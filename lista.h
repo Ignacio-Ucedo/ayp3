@@ -56,18 +56,21 @@ Nodo * buscarPuntero(Nodo *lista, void * direccionBuscado){
     } 
 }
 
-Nodo * eliminardireccionN(Nodo *lista, void* direccionBuscada){
+Nodo * eliminardireccion(Nodo *lista, void* direccionBuscada){
 
     if (lista->direccion == direccionBuscada){
+        printf("Entré a borrar\n");
         lista = lista->proximo;
         return lista;
     } 
 
     if (lista->proximo == NULL){
+        printf("No borré\n");
         return lista;
     }
 
     if (lista->proximo->direccion == direccionBuscada){
+        printf("Entré a borrar\n");
         if (lista->proximo->proximo != NULL){
             void * aux = lista->proximo;
             lista->proximo = lista->proximo->proximo;
@@ -78,7 +81,7 @@ Nodo * eliminardireccionN(Nodo *lista, void* direccionBuscada){
             return lista;
         }
     }
-    lista->proximo = eliminardireccionN(lista->proximo, direccionBuscada);
+    lista->proximo = eliminardireccion(lista->proximo, direccionBuscada);
     return lista;
 }
 
