@@ -12,11 +12,11 @@ Nodo *listaDeMaterias = NULL;
 typedef struct structAlumno {
     char nombre[50];  
     int edad; //es mejor unsigned?
-    struct structNodo *listaMaterias;
+    struct structNodo *listaMateriasAnotado;
 } Alumno;
 
 typedef struct structMateria {
-    char nombre[50];  
+    char nombre[50];
     struct structNodo *listaAnotados;
     struct structNodo *listaAprobados;
 } Materia;
@@ -27,7 +27,7 @@ Alumno * crearPunteroAlumno(char *nombre, int edad) {
     Alumno * miAlumno = (Alumno *)malloc(sizeof(Alumno));
     strcpy(miAlumno->nombre, nombre);  // Copiamos el contenido de nombre
     miAlumno->edad = edad;
-    miAlumno->listaMaterias = NULL;  // Inicializamos la lista de materias a NULL
+    miAlumno->listaMateriasAnotado = NULL;  // Inicializamos la lista de materias a NULL
     return miAlumno;
 }
 
@@ -74,17 +74,35 @@ void listarAlumnos(){
     printf("\n");
 }
 
+
+Nodo * buscarAlumnosPorNombreRecursiva(Nodo * alumnos, Nodo * resultados, char * nombre){
+    if(alumnos->proximo == NULL){
+        return resultados;
+    } 
+    Alumno * alumno = alumnos->direccion;
+    if( strcmp(alumno->nombre, nombre) == 0){
+        resultados = agregar(resultados, alumno);
+        buscarAlumnosPorNombreRecursiva(alumnos->proximo, resultados, nombre);
+    } else {
+        buscarAlumnosPorNombreRecursiva(alumnos->proximo, resultados, nombre);
+    }
+}
+
+Nodo * buscarAlumnosPorNombre(char * nombre){
+    Nodo *listaDeResultados = NULL;
+
+    listaDeResultados = buscarAlumnosPorNombreRecursiva(listaDeAlumnos, listaDeResultados, nombre);
+
+    return listaDeResultados;
+}
 void generarAlumnoDePrueba(char * nombre, int edad){
-    //char * nombre = (char *)malloc(50 * sizeof(char));
-    //int edad;
     Alumno * punteroalumno = crearPunteroAlumno(nombre, edad);
     listaDeAlumnos = agregar(listaDeAlumnos, punteroalumno);
-    //free(nombre); // liberamos la memoria asignada para el nombre
 }
 
 void generarAlumnos(){
     generarAlumnoDePrueba("Carlos", 30);
-    generarAlumnoDePrueba("Ana", 25);
+    generarAlumnoDePrueba("ana", 25);
     generarAlumnoDePrueba("Luis", 22);
     generarAlumnoDePrueba("Marta", 28);
     generarAlumnoDePrueba("Juan", 31);
@@ -93,10 +111,7 @@ void generarAlumnos(){
     generarAlumnoDePrueba("Laura", 26);
     generarAlumnoDePrueba("Pedro", 24);
     generarAlumnoDePrueba("Lucia", 23);
-
 }
-
-
 
 //---------------------------------funciones de materias---------------------------------------------
 Materia * crearPunteroMateria(char *nombre) {
@@ -127,7 +142,7 @@ void modificarMateriaPorTerminal(){
     if(direccionMateriaEncontrada != NULL){
         Materia * direccionMateria = direccionMateriaEncontrada->direccion;
 
-        printf("Ingrese el nuevo nombre de la materia", direccionMateria->nombre);
+        printf("Ingrese el nuevo nombre de la materia\n", direccionMateria->nombre);
         scanf(" %[^\n]", nuevoNombre); // Espacio antes del % para limpiar el buffer
 
         if(strcmp(nuevoNombre, "0") != 0){
@@ -140,10 +155,10 @@ void eliminarMateriaPorTerminal(){
 
     printf("Especifique el número de materia a eliminar\n");
     scanf("%d", &indice); // Espacio antes del % para limpiar el buffer
-    Nodo *direccionAlumnoEncontrado = obtenerPorPosicion(listaDeMaterias, indice);
+    Nodo *direccionMateriaEncontrada = obtenerPorPosicion(listaDeMaterias, indice);
 
-    if(direccionAlumnoEncontrado != NULL){
-        listaDeAlumnos = eliminardireccion(listaDeMaterias, direccionAlumnoEncontrado->direccion);
+    if(direccionMateriaEncontrada != NULL){
+        listaDeMaterias = eliminardireccion(listaDeMaterias, direccionMateriaEncontrada->direccion);
     } 
 }
 
@@ -162,54 +177,84 @@ void listarMaterias(){
     printf("\n");
 }
 
+void listarMateriasDeAlumno(Alumno * direccionAlumno){
+    printf("\n");
+    imprimirListaDeMaterias(direccionAlumno->listaMateriasAnotado, 1);
+    printf("\n");
+}
+
 void modificarAlumnoPorTerminal(){
     int indice;
     char * nuevoNombre = (char *)malloc(50 * sizeof(char));
     int nuevaEdad;
     printf("Especifique el número de alumno a modificar\n");
     scanf("%d", &indice); // Espacio antes del % para limpiar el buffer
-    Nodo *direccionAlumnoEncontrado = obtenerPorPosicion(listaDeAlumnos, indice);
+    Nodo *direccionNodoEncontrado = obtenerPorPosicion(listaDeAlumnos, indice);
 
-    if(direccionAlumnoEncontrado != NULL){
-    int indiceNumerico;
+    if(direccionNodoEncontrado!= NULL){
+        int indiceNumerico;
 
-    Alumno * direccionAlumno = direccionAlumnoEncontrado->direccion;
-    printf("Seleccione la opcion deseada\n");
-    printf("1-Modificar Atributos\n");
-    printf("2-Anotarse en materia\n");
-    printf("3-Rendir Materia");
-    scanf(" %c", &indiceNumerico); // Espacio antes del % para limpiar el buffer
-     if (indiceNumerico == 1) {
-
-
-        printf("Ingrese el nuevo nombre del alumno (%s) (o 0 si quierie mantener la propiedad):\n", direccionAlumno->nombre);
-        scanf(" %[^\n]", nuevoNombre); // Espacio antes del % para limpiar el buffer
-        printf("Ingrese la edad de %s (o 0 si quierie mantener la propiedad):\n", direccionAlumno->nombre);
-        scanf("%d", &nuevaEdad);
-
-        if(strcmp(nuevoNombre, "0") != 0){
-         strcpy(direccionAlumno->nombre, nuevoNombre);  
-        } 
-        if(nuevaEdad != 0){
-        direccionAlumno->edad = nuevaEdad;
-        }
-    } else if (indiceNumerico == 2) {
-        listarMaterias();
-        printf("Seleccione la materia en la que desea anotar al alumno\n");
+        Alumno * direccionAlumno = direccionNodoEncontrado->direccion;
+        printf("Seleccione la opcion deseada\n");
+        printf("1-Modificar Atributos\n");
+        printf("2-Anotarse en materia\n");
+        printf("3-Rendir Materia\n");
         scanf(" %d", &indiceNumerico); // Espacio antes del % para limpiar el buffer
-        Materia * materia = obtenerPorPosicion(listaDeMaterias, indiceNumerico)->direccion;
-        materia->listaAnotados = agregar(materia->listaAnotados, direccionAlumno);
-    }
+        if (indiceNumerico == 1) {
+
+            printf("Ingrese el nuevo nombre del alumno (%s) (o 0 si quierie mantener la propiedad):\n", direccionAlumno->nombre);
+            scanf(" %[^\n]", nuevoNombre); // Espacio antes del % para limpiar el buffer
+            printf("Ingrese la edad de %s (o 0 si quierie mantener la propiedad):\n", direccionAlumno->nombre);
+            scanf("%d", &nuevaEdad);
+
+            if(strcmp(nuevoNombre, "0") != 0){
+            strcpy(direccionAlumno->nombre, nuevoNombre);  
+            } 
+            if(nuevaEdad != 0){
+            direccionAlumno->edad = nuevaEdad;
+            }
+        } else if (indiceNumerico == 2) {
+            listarMaterias();
+            printf("Seleccione la materia en la que desea anotar al alumno\n");
+            scanf(" %d", &indiceNumerico); // Espacio antes del % para limpiar el buffer
+            Materia * materia = obtenerPorPosicion(listaDeMaterias, indiceNumerico)->direccion;
+            materia->listaAnotados = agregar(materia->listaAnotados, direccionAlumno);
+            direccionAlumno->listaMateriasAnotado = agregar(direccionAlumno->listaMateriasAnotado, materia);
+        } else if (indiceNumerico == 3) {
+            listarMateriasDeAlumno(direccionAlumno);
+            printf("Seleccione la materia que ha aprobado el alumno\n");
+            scanf(" %d", &indiceNumerico); // Espacio antes del % para limpiar el buffer
+            Materia * materia = obtenerPorPosicion(direccionAlumno->listaMateriasAnotado, indiceNumerico)->direccion;
+            materia->listaAprobados = agregar(materia->listaAprobados, direccionAlumno);
+            materia->listaAnotados = eliminardireccion(materia->listaAnotados, direccionAlumno);
+            direccionAlumno->listaMateriasAnotado = eliminardireccion(direccionAlumno->listaMateriasAnotado, materia);
+        }
+
 }}
 
 
+void generarMateriaDePrueba(char * nombre){
+    Materia * punteroMateria = crearPunteroMateria(nombre);
+    listaDeMaterias = agregar(listaDeMaterias, punteroMateria);
+}
 
+void generarMaterias() {
+    generarMateriaDePrueba("Matemáticas");
+    generarMateriaDePrueba("Historia");
+    generarMateriaDePrueba("Física");
+    generarMateriaDePrueba("Química");
+    generarMateriaDePrueba("Biología");
+    generarMateriaDePrueba("Geografía");
+    generarMateriaDePrueba("Literatura");
+    generarMateriaDePrueba("Arte");
+    generarMateriaDePrueba("Educación Física");
+    generarMateriaDePrueba("Informática");
+}
 
 int main(void) {
-generarAlumnos();
-
-
-while (1){ 
+    generarAlumnos();
+    generarMaterias();
+    while (1){ 
         int interruptor = 0;
         int indiceNumerico;
         printf("Seleccione la opción deseada\n");
@@ -224,7 +269,8 @@ while (1){
             printf("a. dar de alta alumno\n");
             printf("b. modificar alumno\n");
             printf("c. eliminar alumno\n");
-            printf("d. salir\n");
+            printf("d. buscar alumno\n");
+            printf("e. salir\n");
             scanf(" %c", &indiceAlfabetico); // Espacio antes del % para limpiar el buffer
 
             printf("Seleccione la opción deseada\n");
@@ -236,6 +282,23 @@ while (1){
             } else if(indiceAlfabetico == 'c'){
                 eliminarAlumnoPorTerminal();
             } else if(indiceAlfabetico == 'd'){
+                printf("a. buscar por nombre\n");
+                printf("b. buscar por rango de edad\n");
+                scanf(" %c", &indiceAlfabetico); // Espacio antes del % para limpiar el buffer
+
+                if(indiceAlfabetico == 'a'){
+                    char * nombre = (char *)malloc(50 * sizeof(char));
+                    printf("Ingrese el nombre\n");
+                    scanf(" %[^\n]", nombre); // Espacio antes del % para limpiar el buffer
+                    Nodo * resultados = buscarAlumnosPorNombre(nombre);
+                    if (resultados != NULL){
+                        imprimirListaDeAlumnos(resultados, 1);
+                        printf("Seleccione el alumno\n");
+                        scanf(" %[^\n]", nombre); // Espacio antes del % para limpiar el buffer
+                    }
+                }
+                
+            } else if(indiceAlfabetico == 'e'){
                 interruptor = 1;
             }
             }
@@ -245,10 +308,10 @@ while (1){
                 listarMaterias();
                 char indiceAlfabetico;
 
-                printf("a. dar de alta Materia]\n");
+                printf("a. dar de alta Materia\n");
                 printf("b. modificar Materia\n");
                 printf("c. eliminar Materia\n");
-                printf("d. Salir\n");
+                printf("d. salir\n");
 
                 printf("Seleccione la opción deseada\n");
                 scanf(" %c", &indiceAlfabetico); // Espacio antes del % para limpiar el buffer
@@ -263,22 +326,8 @@ while (1){
                     interruptor = 1;
                 }
             }
-    //-------------------------
-
-            }
-
-
-        
         }
-    
-
-
-
-
-
-    //-------------------------
-
-
+    }
 
     return 0;
 }
