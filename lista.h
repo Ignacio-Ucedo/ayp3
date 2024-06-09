@@ -31,13 +31,13 @@ int tamano(Nodo *lista){
     return 1 + tamano(lista->proximo);
 }
 
-//Devuelve el nodo con índice buscado dado por la posición (índice 1, no 0). 
+//Devuelve el nodo con índice buscado dado por la posición (índice 1, no 0). Usar siempre con verificación
+//de un posible retorno nulo
 Nodo * obtenerPorPosicion(Nodo * lista, int posicion){
     if(lista == NULL){
-        printf("No se ha encontrado el nodo buscado en la posición dada\n");
+        printf("No existe la posición indicada\n");
         return NULL;
     } else if (posicion == 1){
-        printf("Se ha encontrado el nodo buscado\n");
         return lista;
     } else {
         return obtenerPorPosicion(lista->proximo, posicion-1);
@@ -46,10 +46,8 @@ Nodo * obtenerPorPosicion(Nodo * lista, int posicion){
 
 Nodo * buscarPuntero(Nodo *lista, void * direccionBuscado){
     if (lista == NULL){
-        printf("No se ha encontrado el direccion buscado %d\n", direccionBuscado);
         return NULL;
     } else if (lista->direccion == direccionBuscado){
-        printf("Se ha encontrado el direccion buscado %d\n", direccionBuscado);
         return lista;
     } else{
         return buscarPuntero(lista->proximo, direccionBuscado);
@@ -92,4 +90,3 @@ void imprimir(Nodo *lista){
     printf("%d\n", lista->direccion);
     imprimir(lista->proximo);
 }
-
