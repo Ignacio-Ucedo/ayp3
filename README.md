@@ -1,4 +1,5 @@
 # Informe del Proyecto en C: Gestión de Alumnos y Materias
+## Link al video explicativo: https://www.youtube.com/watch?v=dpkcuZaobVE
 ## Introducción
 ## En el presente informe, se describe el desarrollo de un sistema de gestión de alumnos y materias utilizando el lenguaje de programación C. Este sistema permite administrar la información de alumnos y materias, así como las relaciones entre ellos, proporcionando funcionalidades para alta, baja, modificación y consulta de datos. A continuación, se presentan las etapas del desarrollo del proyecto, incluyendo ejemplos de código y explicaciones detalladas.
 
