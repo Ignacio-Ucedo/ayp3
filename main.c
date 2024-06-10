@@ -8,9 +8,8 @@
 
 #include <windows.h>
 
-#include "lista.h"
-
 #include "utilidades.h"
+#include "lista.h"
 
 #include <unistd.h>
 
@@ -88,8 +87,7 @@ void darDeAltaMateriaPorTerminal() {
   Materia * punteroaMateria = crearPunteroMateria(nombre);
   listaDeMaterias = agregar(listaDeMaterias, punteroaMateria);
   free(nombre); 
-  printf("La Materia se dio de alta correctamente\n");
-  sleep(2);
+  printTemporal("La Materia se dio de alta correctamente");
 }
 void imprimirListaDeAlumnos(Nodo * lista, int tamanoColumnaIndices, int tamanoColumnas, int indice) {
   if (lista == NULL) {
@@ -100,7 +98,7 @@ void imprimirListaDeAlumnos(Nodo * lista, int tamanoColumnaIndices, int tamanoCo
   printf("%d", indice);
   printf("\033[%dC", tamanoColumnaIndices - cantidadDeDigitos(indice));
   printf("%s", alumno.nombre);
-  printf("\033[%dC", tamanoColumnas - strlen(alumno.nombre));
+  printf("\033[%dC", tamanoColumnas - strlenUtf8(alumno.nombre));
   printf("%d", alumno.edad);
   printf("\033[%dC", tamanoColumnas - cantidadDeDigitos(alumno.edad));
   printf("%d", tamano(alumno.listaMateriasAnotado));
@@ -118,7 +116,7 @@ void imprimirAlumno(Nodo * nodoAlumno, int tamanoColumnas, int indice) {
 void listarAlumnos(Nodo * lista) {
   int tamanoColumnaDeIndices = cantidadDeDigitos(tamano(lista)) + 1;
   printf("\033[%dC", tamanoColumnaDeIndices);
-  int tamanoColumnas = 40;
+  int tamanoColumnas = 30;
   printf("Nombre");
   printf("\033[%dC", tamanoColumnas - strlen("Nombre"));
   printf("Edad");
@@ -132,7 +130,7 @@ void listarAlumnos(Nodo * lista) {
   printf("\n");
 }
 void listarAlumno(Nodo * nodoAlumno) {
-  int tamanoColumnas = 40;
+  int tamanoColumnas = 30;
   Alumno * alumno = nodoAlumno -> direccion;
   printf("Nombre");
   printf("\033[%dC", tamanoColumnas - strlen("Nombre"));
@@ -153,66 +151,62 @@ void listarAlumno(Nodo * nodoAlumno) {
   printf("\n");
 }
 void accederMateriaPorTerminal(Nodo * lista, int indice) {
-  Nodo * direccionMateriaEncontrada = obtenerPorPosicion(lista, indice);
-  if (direccionMateriaEncontrada != NULL) {
-    Materia * MateriaEncontrada = direccionMateriaEncontrada -> direccion;
-    listarMateria(direccionMateriaEncontrada);
-    printf("1-Modificar Nombre\n");
-    printf("2-Anotar Alumno\n");
-    printf("3-Alumnos Anotados\n");
-    printf("4-Alumnos Aprobados\n");
-    printf("5-Salir\n\n");
-    int opcionElegida = escanearEntero("Seleccione la opcion deseada");
-    if (opcionElegida == 1) {
-      char * nuevoNombre = escanearCadena("Ingrese el nuevo nombre");
-      strcpy(MateriaEncontrada -> nombre, nuevoNombre);
-    } else if (opcionElegida == 2) {
-      listarAlumnos(listaDeAlumnos);
-      int opcionElegida = escanearEntero("Seleccione el alumno que desea anotar");
-      Nodo * nodoAlumno = obtenerPorPosicion(listaDeAlumnos, opcionElegida);
-      if (nodoAlumno != NULL) {
-        Alumno * alumno = nodoAlumno -> direccion;
-        MateriaEncontrada -> listaAnotados = agregar(MateriaEncontrada -> listaAnotados, alumno);
-        alumno -> listaMateriasAnotado = agregar(alumno -> listaMateriasAnotado, MateriaEncontrada);
-        printf("El alumno se ha anotado correctamente\n");
-        sleep(2);
-      }
-
-    } else if (opcionElegida == 3) {
-      if (MateriaEncontrada -> listaAnotados) {
-        listarAlumnos(MateriaEncontrada -> listaAnotados);
-        int numeroalumnoElegido = escanearEntero("Seleccione el alumno deseado");
-        Nodo * NodoAlumnoElegido = obtenerPorPosicion(MateriaEncontrada -> listaAnotados, numeroalumnoElegido);
-        if (NodoAlumnoElegido != NULL) {
-          Alumno * alumnoElegido = NodoAlumnoElegido -> direccion;
-          listarAlumno(NodoAlumnoElegido);
-          printf("1-Aprobar Alumno\n");
-          printf("2-Eliminar Alumno\n");
-          int opcionElegida = escanearEntero("Seleccione la opcion deseada");
-          if (opcionElegida == 1) {
-            MateriaEncontrada -> listaAprobados = agregar(MateriaEncontrada -> listaAprobados, alumnoElegido);
-            alumnoElegido -> listaMateriasAprobado = agregar(alumnoElegido -> listaMateriasAprobado, MateriaEncontrada);
-            MateriaEncontrada -> listaAnotados = eliminardireccion(MateriaEncontrada -> listaAnotados, alumnoElegido);
-            alumnoElegido -> listaMateriasAnotado = eliminardireccion(alumnoElegido -> listaMateriasAnotado, MateriaEncontrada);
-          } else if (opcionElegida == 2) {
-            MateriaEncontrada -> listaAnotados = eliminardireccion(MateriaEncontrada -> listaAnotados, alumnoElegido);
-            alumnoElegido -> listaMateriasAnotado = eliminardireccion(alumnoElegido -> listaMateriasAnotado, MateriaEncontrada);
-          }
+    Nodo * direccionMateriaEncontrada = obtenerPorPosicion(lista, indice);
+    if (direccionMateriaEncontrada != NULL) {
+        Materia * MateriaEncontrada = direccionMateriaEncontrada -> direccion;
+        listarMateria(direccionMateriaEncontrada);
+        printf("1-Modificar Nombre\n");
+        printf("2-Anotar Alumno\n");
+        printf("3-Alumnos Anotados\n");
+        printf("4-Alumnos Aprobados\n");
+        printf("5-Salir\n\n");
+        int opcionElegida = escanearEntero("Seleccione la opcion deseada");
+        if (opcionElegida == 1) {
+            char * nuevoNombre = escanearCadena("Ingrese el nuevo nombre");
+            strcpy(MateriaEncontrada -> nombre, nuevoNombre);
+        } else if (opcionElegida == 2) {
+            listarAlumnos(listaDeAlumnos);
+            int opcionElegida = escanearEntero("Seleccione el alumno que desea anotar");
+            Nodo * nodoAlumno = obtenerPorPosicion(listaDeAlumnos, opcionElegida);
+            if (nodoAlumno != NULL) {
+                Alumno * alumno = nodoAlumno -> direccion;
+                MateriaEncontrada -> listaAnotados = agregar(MateriaEncontrada -> listaAnotados, alumno);
+                alumno -> listaMateriasAnotado = agregar(alumno -> listaMateriasAnotado, MateriaEncontrada);
+                printTemporal("El alumno se ha anotado correctamente");
+            } 
+        } else if (opcionElegida == 3) {
+            if (MateriaEncontrada -> listaAnotados) {
+                listarAlumnos(MateriaEncontrada -> listaAnotados);
+                int numeroalumnoElegido = escanearEntero("Seleccione el alumno deseado");
+                Nodo * NodoAlumnoElegido = obtenerPorPosicion(MateriaEncontrada -> listaAnotados, numeroalumnoElegido);
+                if (NodoAlumnoElegido != NULL) {
+                    Alumno * alumnoElegido = NodoAlumnoElegido -> direccion;
+                    listarAlumno(NodoAlumnoElegido);
+                    printf("1-Aprobar Alumno\n");
+                    printf("2-Eliminar Alumno\n");
+                    int opcionElegida = escanearEntero("Seleccione la opcion deseada");
+                    if (opcionElegida == 1) {
+                        MateriaEncontrada -> listaAprobados = agregar(MateriaEncontrada -> listaAprobados, alumnoElegido);
+                        alumnoElegido -> listaMateriasAprobado = agregar(alumnoElegido -> listaMateriasAprobado, MateriaEncontrada);
+                        MateriaEncontrada -> listaAnotados = eliminardireccion(MateriaEncontrada -> listaAnotados, alumnoElegido);
+                        alumnoElegido -> listaMateriasAnotado = eliminardireccion(alumnoElegido -> listaMateriasAnotado, MateriaEncontrada);
+                    } else if (opcionElegida == 2) {
+                        MateriaEncontrada -> listaAnotados = eliminardireccion(MateriaEncontrada -> listaAnotados, alumnoElegido);
+                        alumnoElegido -> listaMateriasAnotado = eliminardireccion(alumnoElegido -> listaMateriasAnotado, MateriaEncontrada);
+                    }
+                } 
+            } else {
+            printTemporal("La Materia no tiene alumnos anotados");
+            }
+        } else if (opcionElegida == 4) {
+            if (MateriaEncontrada -> listaAprobados != NULL) {
+            listarAlumnos(MateriaEncontrada -> listaAprobados);
+            int alumnoElegido = escanearEntero("Ingrese 0 para continuar");
+            } else {
+            printTemporal("La Materia no tiene alumnos aprobados");
+            }
         }
-      } else {
-        printf("La Materia no tiene alumnos anotados");
-        sleep(2);
-      }
-    } else if (opcionElegida == 4) {
-      if (MateriaEncontrada -> listaAprobados != NULL) {
-        listarAlumnos(MateriaEncontrada -> listaAprobados);
-        int alumnoElegido = escanearEntero("Ingrese 0 para continuar");
-      } else {
-        printf("La Materia no tiene alumnos aprobados");
-        sleep(2);
-      }
     }
-  }
 }
 void eliminarMateriaPorTerminal() {
 
@@ -221,9 +215,8 @@ void eliminarMateriaPorTerminal() {
 
   if (direccionMateriaEncontrada != NULL) {
     listaDeMaterias = eliminardireccion(listaDeMaterias, direccionMateriaEncontrada -> direccion);
+    printTemporal("La materia se elimino correctamente\n");
   }
-  printf("La materia se elimino correctamente\n");
-  sleep(2);
 }
 
 void listarMateriasDeAlumno(Alumno * direccionAlumno) {
@@ -268,20 +261,17 @@ void darDeAltaAlumnoPorTerminal() {
   Alumno * punteroalumno = crearPunteroAlumno(nombre, edad);
   listaDeAlumnos = agregar(listaDeAlumnos, punteroalumno);
   free(nombre);
-  printf("El alumno se dio de alta correctamente\n");
-  sleep(2);
+  printTemporal("El alumno se dio de alta correctamente");
 }
 
 void eliminarAlumnoPorTerminal() {
 
   int indice = escanearEntero("Especifique el número de índice que refiere al alumno que quiere eliminar");
   Nodo * direccionAlumnoEncontrado = obtenerPorPosicion(listaDeAlumnos, indice);
-
   if (direccionAlumnoEncontrado != NULL) {
     listaDeAlumnos = eliminardireccion(listaDeAlumnos, direccionAlumnoEncontrado -> direccion);
+    printTemporal("El alumno se elimino correctamente");
   }
-  printf("El alumno se elimino correctamente\n");
-  sleep(2);
 }
 
 Nodo * buscarAlumnosPorNombreRecursiva(Nodo * alumnos, Nodo * resultados, char * nombre) {
@@ -307,53 +297,55 @@ Nodo * buscarAlumnosPorNombre(char * nombre) {
 }
 
 void accederAlumnoPorTerminal(Nodo * lista, int indice) {
-
-  Nodo * direccionNodoEncontrado = obtenerPorPosicion(lista, indice);
-  if (direccionNodoEncontrado != NULL) {
-    limpiarPantalla();
-    listarAlumno(direccionNodoEncontrado);
-    int nuevaEdad;
-    Alumno * direccionAlumno = direccionNodoEncontrado -> direccion;
-    printf("1-Modificar Atributos\n");
-    printf("2-Anotarse en materia\n");
-    printf("3-Rendir Materia\n");
-    printf("\n");
-    int indiceNumerico = escanearEntero("Seleccione la opción deseada");
-    if (indiceNumerico == 1) {
-      char * titulo = concatenar("\nIngrese el nuevo nombre del alumno (0 para no modificar), antes ", direccionAlumno -> nombre);
-      char * nuevoNombre = escanearCadena(titulo);
-      if (strcmp(nuevoNombre, "0") != 0) {
-        strcpy(direccionAlumno -> nombre, nuevoNombre);
-      }
-      nuevaEdad = escanearEntero("Ingrese la nueva edad del alumno, 0 para no modificar");
-      if (nuevaEdad != 0) {
-        direccionAlumno -> edad = nuevaEdad;
-      }
-    } else if (indiceNumerico == 2) {
-      listarMaterias(listaDeMaterias);
-      indiceNumerico = escanearEntero("Seleccione la materia en la que desea anotar al alumno\n");
-      Materia * materia = obtenerPorPosicion(listaDeMaterias, indiceNumerico) -> direccion;
-      if (buscarPuntero(direccionAlumno -> listaMateriasAprobado, materia) == NULL) {
-        materia -> listaAnotados = agregar(materia -> listaAnotados, direccionAlumno);
-        direccionAlumno -> listaMateriasAnotado = agregar(direccionAlumno -> listaMateriasAnotado, materia);
-        printf("El alumno se anoto en la materia correctamente\n");
-        sleep(2);
-      } else {
-        printf("El alumno ya ha aprobado esa materia.\n");
-        sleep(2);
-      }
-    } else if (indiceNumerico == 3) {
-      listarMateriasDeAlumno(direccionAlumno);
-      indiceNumerico = escanearEntero("Seleccione la materia que ha aprobado el alumno");
-      Materia * materia = obtenerPorPosicion(direccionAlumno -> listaMateriasAnotado, indiceNumerico) -> direccion;
-      materia -> listaAprobados = agregar(materia -> listaAprobados, direccionAlumno);
-      direccionAlumno -> listaMateriasAprobado = agregar(direccionAlumno -> listaMateriasAprobado, materia);
-      materia -> listaAnotados = eliminardireccion(materia -> listaAnotados, direccionAlumno);
-      direccionAlumno -> listaMateriasAnotado = eliminardireccion(direccionAlumno -> listaMateriasAnotado, materia);
-      printf("La aprobacion se realizo correctamente.\n");
-      sleep(2);
+    Nodo * direccionNodoEncontrado = obtenerPorPosicion(lista, indice);
+    if (direccionNodoEncontrado != NULL) {
+        limpiarPantalla();
+        listarAlumno(direccionNodoEncontrado);
+        int nuevaEdad;
+        Alumno * direccionAlumno = direccionNodoEncontrado -> direccion;
+        printf("1-Modificar Atributos\n");
+        printf("2-Anotarse en materia\n");
+        printf("3-Rendir Materia\n");
+        printf("\n");
+        int indiceNumerico = escanearEntero("Seleccione la opción deseada");
+        if (indiceNumerico == 1) {
+            char * titulo = concatenar("\nIngrese el nuevo nombre del alumno (0 para no modificar), antes ", direccionAlumno -> nombre);
+            char * nuevoNombre = escanearCadena(titulo);
+            if (strcmp(nuevoNombre, "0") != 0) {
+            strcpy(direccionAlumno -> nombre, nuevoNombre);
+            }
+            nuevaEdad = escanearEntero("Ingrese la nueva edad del alumno, 0 para no modificar");
+            if (nuevaEdad != 0) {
+            direccionAlumno -> edad = nuevaEdad;
+            }
+        } else if (indiceNumerico == 2) {
+            listarMaterias(listaDeMaterias);
+            indiceNumerico = escanearEntero("Seleccione la materia en la que desea anotar al alumno\n");
+            Nodo* nodoMateria = obtenerPorPosicion(listaDeMaterias, indiceNumerico);
+            if(nodoMateria!= NULL){
+                Materia * materia = nodoMateria-> direccion;
+                if (buscarPuntero(direccionAlumno -> listaMateriasAprobado, materia) == NULL) {
+                    materia -> listaAnotados = agregar(materia -> listaAnotados, direccionAlumno);
+                    direccionAlumno -> listaMateriasAnotado = agregar(direccionAlumno -> listaMateriasAnotado, materia);
+                    printTemporal("El alumno se anoto en la materia correctamente");
+                } else {
+                    printTemporal("El alumno ya ha aprobado esa materia");
+                }
+            }
+        } else if (indiceNumerico == 3) {
+            listarMateriasDeAlumno(direccionAlumno);
+            indiceNumerico = escanearEntero("Seleccione la materia que ha aprobado el alumno");
+            Nodo* nodoMateria = obtenerPorPosicion(direccionAlumno -> listaMateriasAnotado, indiceNumerico);
+            if(nodoMateria!= NULL){
+                Materia * materia = nodoMateria-> direccion;
+                materia -> listaAprobados = agregar(materia -> listaAprobados, direccionAlumno);
+                direccionAlumno -> listaMateriasAprobado = agregar(direccionAlumno -> listaMateriasAprobado, materia);
+                materia -> listaAnotados = eliminardireccion(materia -> listaAnotados, direccionAlumno);
+                direccionAlumno -> listaMateriasAnotado = eliminardireccion(direccionAlumno -> listaMateriasAnotado, materia);
+                printTemporal("La aprobacion se realizo correctamente");
+            }
+        }
     }
-  }
 }
 
 void buscarAlumnoPorTerminal() {
@@ -370,8 +362,7 @@ void buscarAlumnoPorTerminal() {
       int alumnoSeleccionado = escanearEntero("Seleccione el alumno");
       accederAlumnoPorTerminal(resultados, alumnoSeleccionado);
     } else {
-      printf("No se encontro ningun alumno con el nombre deseado.\n");
-      sleep(2);
+      printTemporal("No se encontro ningun alumno con el nombre deseado");
     }
   } else if (strcmp(indiceAlfabetico, "b") == 0) {
     limpiarPantalla();
@@ -394,8 +385,7 @@ void buscarAlumnoPorTerminal() {
       if (esEntero(alumnoSeleccionado) == 0)
         accederAlumnoPorTerminal(resultados, atoi(alumnoSeleccionado));
     } else {
-      printf("No se encontro ningun alumno con el rango de edad deseado.\n");
-      sleep(2);
+      printTemporal("No se encontro ningun alumno con el rango de edad deseado.");
     }
   }
 }
@@ -485,7 +475,8 @@ void generarAlumnos() {
 int main(void) {
   compatibilidadANSI();
   compatibilidadUTF8();
-  while (1) {
+  int interrupcionPrincipal = 0;
+  while (interrupcionPrincipal == 0) {
     limpiarPantalla();
     int interruptor = 0;
     printf("1 - Menu Alumnos\n");
@@ -548,11 +539,11 @@ int main(void) {
       } else if (indiceNumerico == 3) {
         generarAlumnos();
         generarMaterias();
-        printf("Los alumnos y materias de prueba se han creado correctamente.\n");
-        sleep(2);
-
+        printTemporal("Los alumnos y materias de prueba se han creado correctamente.");
+      } else if (indiceNumerico == 4){
+            interrupcionPrincipal= 1;
       } else {
-        return 0;
+            printTemporal("No ha seleccionado una opción válida");
       }
     }
   }

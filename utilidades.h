@@ -4,6 +4,8 @@
 #include <wchar.h>
 #include <windows.h>
 #include <malloc.h>
+#include <unistd.h>
+
 //https://learn.microsoft.com/en-us/windows/console/clearing-the-screen
 void limpiarEnConsolaWindows(HANDLE hConsole)
 {
@@ -37,6 +39,7 @@ void limpiarPantalla(){
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
     limpiarEnConsolaWindows(hStdout);
 }
+
 void colorDeFuente(char * color){
     if(color == "verde"){
         printf("\033[38;5;49m");
@@ -44,6 +47,8 @@ void colorDeFuente(char * color){
         printf("\033[38;5;11m");
     } else if(color == "gris"){
         printf("\033[38;5;241m");
+    } else if(color == "celeste"){
+        printf("\033[38;5;81m");
     }else if(color == "defecto"){
         printf("\033[0m");
     }
@@ -130,17 +135,42 @@ int cantidadDeDigitos(int numero){
 }
 //Retorna cero si la cadena b está dentro de la cadena a, insensible a minúsculas
 int compararCadenas(const char *a, const char *b) {
-    if(*a==0){
+    if(*a == 0 && *b != 0) {
         return -1;
     }
-    const char * primerCaracter = b;
-    for (; *b; ++a, ++b) {
-        if (*a){
-            int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
-            if (d != 0) {
-                return compararCadenas(++a, primerCaracter);
-            }
+    
+    const char *inicio_a = a;
+    const char *inicio_b = b;
+
+    while (*a) {
+        const char *p = a;
+        const char *q = b;
+        
+        while (*q && tolower((unsigned char)*p) == tolower((unsigned char)*q)) {
+            ++p;
+            ++q;
         }
+
+        if (*q == 0) {
+            return 0;
+        }
+
+        ++a;
     }
-    return 0;
+
+    return -1;
+}
+size_t strlenUtf8(const char *s) {
+    size_t count = 0;
+    while (*s) {
+        count += (*s++ & 0xC0) != 0x80;
+    }
+    return count;
+}
+
+void printTemporal(char * mensaje){
+    colorDeFuente("celeste");
+    printf("%s\n", mensaje);
+    colorDeFuente("defecto");
+    sleep(2);
 }

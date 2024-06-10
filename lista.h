@@ -48,7 +48,7 @@ int tamano(Nodo *lista){
 //de un posible retorno nulo
 Nodo * obtenerPorPosicion(Nodo * lista, int posicion){
     if(lista == NULL){
-        printf("No existe la posición indicada\n");
+        printTemporal("No existe la posición indicada");
         return NULL;
     } else if (posicion == 1){
         return lista;
