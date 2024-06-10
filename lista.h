@@ -7,19 +7,32 @@ typedef struct structNodo {
     struct structNodo* proximo;
 } Nodo;
 
+Nodo * buscarPuntero(Nodo *lista, void * direccionBuscado){
+    if (lista == NULL){
+        return NULL;
+    } else if (lista->direccion == direccionBuscado){
+        return lista;
+    } else{
+        return buscarPuntero(lista->proximo, direccionBuscado);
+    } 
+}
 //métodos
 Nodo *agregar(Nodo* lista, void* direccion) {
     Nodo *nuevoNodo = (Nodo*)malloc(sizeof(Nodo));
     nuevoNodo->direccion = direccion;
     nuevoNodo->proximo = NULL;
+    if (buscarPuntero(lista, direccion) != NULL){
+        return lista;
+    } else {
     if (lista == NULL) {
-        lista = nuevoNodo;
+         lista = nuevoNodo;
     } else {
         Nodo *cursor = lista;
         while (cursor->proximo != NULL) {
             cursor = cursor->proximo;
         }
         cursor->proximo = nuevoNodo;
+    }
     }
     return lista;
 }
@@ -44,31 +57,19 @@ Nodo * obtenerPorPosicion(Nodo * lista, int posicion){
     }
 }
 
-Nodo * buscarPuntero(Nodo *lista, void * direccionBuscado){
-    if (lista == NULL){
-        return NULL;
-    } else if (lista->direccion == direccionBuscado){
-        return lista;
-    } else{
-        return buscarPuntero(lista->proximo, direccionBuscado);
-    } 
-}
 
 Nodo * eliminardireccion(Nodo *lista, void* direccionBuscada){
 
     if (lista->direccion == direccionBuscada){
-        printf("Entré a borrar\n");
         lista = lista->proximo;
         return lista;
     } 
 
     if (lista->proximo == NULL){
-        printf("No borré\n");
         return lista;
     }
 
     if (lista->proximo->direccion == direccionBuscada){
-        printf("Entré a borrar\n");
         if (lista->proximo->proximo != NULL){
             void * aux = lista->proximo;
             lista->proximo = lista->proximo->proximo;
